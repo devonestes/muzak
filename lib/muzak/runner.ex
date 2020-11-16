@@ -1,5 +1,6 @@
 defmodule Muzak.Runner do
   @moduledoc false
+
   # All the code to actually run the tests and such
 
   alias Muzak.Formatter
@@ -9,11 +10,11 @@ defmodule Muzak.Runner do
     start = System.monotonic_time(:microsecond)
 
     results =
-        Enum.reduce(mutations, [], fn mutation, acc ->
-          mutation
-          |> run_mutation(test_info, runner)
-          |> handle_result(acc)
-        end)
+      Enum.reduce(mutations, [], fn mutation, acc ->
+        mutation
+        |> run_mutation(test_info, runner)
+        |> handle_result(acc)
+      end)
 
     finish_time = System.monotonic_time(:microsecond) - start
 
@@ -24,7 +25,8 @@ defmodule Muzak.Runner do
   def run_mutation(mutation_info, test_info, runner) do
     fn ->
       results =
-        with :ok <- compile_mutation(mutation_info) do
+        with :ok <- compile_mutation(mutation_info),
+             :ok <- compile_dependencies(mutation_info) do
           run_tests(test_info, runner)
         end
 
@@ -106,6 +108,45 @@ defmodule Muzak.Runner do
         print("Mutation failed to compile")
         :compilation_error
     end
+  end
+
+  defp compile_dependencies(%{original: ["defmacro" | _]} = mutation_info) do
+    print("Mutating dependencies of mutated file")
+
+    {_, _, sources} =
+      Mix.Project.manifest_path()
+      |> Path.join("compile.elixir")
+      |> File.read!()
+      |> :erlang.binary_to_term()
+
+    modules_defined =
+      Enum.find_value(sources, fn {_, path, _, _, _, _, _, _, _, modules} ->
+        if path == mutation_info.path do
+          modules
+        else
+          false
+        end
+      end)
+
+    try do
+      Enum.each(sources, fn {_, path, _, module_dependencies, _, _, _, _, _, _} ->
+        if Enum.any?(module_dependencies, &(&1 in modules_defined)) do
+          Code.compile_file(path)
+        end
+      end)
+
+      print("Mutating dependencies of mutated file completed")
+      :ok
+    rescue
+      _ ->
+        print("Mutating dependencies of mutated file failed")
+        :compilation_error
+    end
+  end
+
+  defp compile_dependencies(_) do
+    print("No compile dependencies to recompile")
+    :ok
   end
 
   defp run_tests({matched_test_files, _, _, _, _}, runner) do
