@@ -18,6 +18,7 @@ defmodule Muzak.Config do
     Mix.Task.run("compile", args)
     Mix.Task.run("app.start", args)
     Application.ensure_loaded(:ex_unit)
+    :ok = Application.ensure_started(:logger)
     opts = get_opts(args)
 
     {matched_test_files, test_paths, ex_unit_opts} = configure_ex_unit(opts)
