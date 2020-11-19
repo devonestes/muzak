@@ -20,31 +20,31 @@ defmodule Muzak.Mutators.Constants.NumbersTest do
         """)
 
       node1 = {:__block__, [token: "1", line: 6], [1]}
-      mutation1 = {:__block__, [token: "792_762", line: 6], [792_762]}
+      mutation1 = {:__block__, [token: "2", line: 6], [2]}
 
       node2 = {:__block__, [token: "3.02", line: 6], [3.02]}
-      mutation2 = {:__block__, [token: "792_762", line: 6], [792_762]}
+      mutation2 = {:__block__, [token: "4.02", line: 6], [4.02]}
 
       node3 = {:__block__, [token: "2", line: 6], [2]}
-      mutation3 = {:__block__, [token: "792_762", line: 6], [792_762]}
+      mutation3 = {:__block__, [token: "3", line: 6], [3]}
 
       node4 = {:__block__, [token: "0", line: 6], [0]}
-      mutation4 = {:__block__, [token: "792_762", line: 6], [792_762]}
+      mutation4 = {:__block__, [token: "1", line: 6], [1]}
 
       node5 = {:__block__, [token: "1", line: 7], [1]}
-      mutation5 = {:__block__, [token: "792_762", line: 7], [792_762]}
+      mutation5 = {:__block__, [token: "2", line: 7], [2]}
 
       node6 = {:__block__, [token: "0", line: 7], [0]}
-      mutation6 = {:__block__, [token: "792_762", line: 7], [792_762]}
+      mutation6 = {:__block__, [token: "1", line: 7], [1]}
 
       node7 = {:__block__, [token: "9", line: 8], [9]}
-      mutation7 = {:__block__, [token: "792_762", line: 8], [792_762]}
+      mutation7 = {:__block__, [token: "10", line: 8], [10]}
 
       node8 = {:__block__, [token: "8", line: 8], [8]}
-      mutation8 = {:__block__, [token: "792_762", line: 8], [792_762]}
+      mutation8 = {:__block__, [token: "9", line: 8], [9]}
 
       ast
-      |> Numbers.mutate(fn _ -> 792_762 end)
+      |> Numbers.mutate(fn _ -> 1 end)
       |> assert_lists_equal([
         %{
           mutated_ast: Mutator.replace_node(ast, node1, mutation1),
@@ -104,7 +104,7 @@ defmodule Muzak.Mutators.Constants.NumbersTest do
 
       node = {:__block__, [token: "1", line: 3], [1]}
 
-      mutation = {:__block__, [token: "792_762", line: 3], [792_762]}
+      mutation = {:__block__, [token: "792_763", line: 3], [792_763]}
 
       assert Numbers.mutate(node, ast, fn _ -> 792_762 end) == %{
                mutated_ast: Mutator.replace_node(ast, node, mutation),

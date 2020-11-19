@@ -1,7 +1,7 @@
 defmodule Muzak.MixProject do
   use Mix.Project
 
-  @version "1.0.1"
+  @version "1.0.2"
 
   @source_url "https://github.com/devonestes/muzak"
   @homepage_url "https://devonestes.com/muzak"
@@ -30,7 +30,7 @@ defmodule Muzak.MixProject do
     ]
   end
 
-  def application, do: []
+  def application, do: [extra_applications: [:logger]]
 
   defp docs() do
     [

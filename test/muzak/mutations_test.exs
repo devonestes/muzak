@@ -48,12 +48,12 @@ defmodule Muzak.MutationsTest do
           String.trim_trailing("""
           defmodule TestModule do
             def test_fun(var) do
-              var in [32_779, 2]
+              var in [32_780, 2]
             end
           end
           """),
         line: 3,
-        mutation: ["var", " in ", "[", "", "32_779", ",", " ", "2", "", "]"],
+        mutation: ["var", " in ", "[", "", "32_780", ",", " ", "2", "", "]"],
         original: ["var", " in ", "[", "", "1", ",", " ", "2", "", "]"],
         original_file: file,
         path: "path/to/file.ex"
@@ -64,12 +64,12 @@ defmodule Muzak.MutationsTest do
           String.trim_trailing("""
           defmodule TestModule do
             def test_fun(var) do
-              var in [1, 32_779]
+              var in [1, 32_781]
             end
           end
           """),
         line: 3,
-        mutation: ["var", " in ", "[", "", "1", ",", " ", "32_779", "", "]"],
+        mutation: ["var", " in ", "[", "", "1", ",", " ", "32_781", "", "]"],
         original: ["var", " in ", "[", "", "1", ",", " ", "2", "", "]"],
         original_file: file,
         path: "path/to/file.ex"

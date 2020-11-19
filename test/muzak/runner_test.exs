@@ -66,10 +66,23 @@ defmodule Muzak.RunnerTest do
       test_files = [:a, :b]
       test_paths = [:c, :d]
       opts = [:e, :f]
-      mutations = [%{original_file: "{1, 2}", file: "{1, 2"}]
+
+      mutations = [
+        %{
+          original_file: "{1, 2}",
+          file: "{1, 2",
+          path: "/to/file.ex",
+          original: "",
+          mutation: "",
+          line: 1
+        }
+      ]
+
       test_info = {test_files, test_paths, opts, mutations, []}
 
-      assert {[], 1, num, []} = Runner.run_test_loop(test_info, &SuccessCompiler.require_and_run/1)
+      assert {[], 1, num, []} =
+               Runner.run_test_loop(test_info, &SuccessCompiler.require_and_run/1)
+
       assert num > 1
 
       assert_receive {Formatter, {"Mutating file", :nonode@nohost}}
@@ -84,14 +97,28 @@ defmodule Muzak.RunnerTest do
       test_files = [:a, :b]
       test_paths = [:c, :d]
       opts = [:e, :f]
-      mutations = [%{original_file: "{1, 2, 3}", file: "{3, 2, 1}", line: 1}]
+
+      mutations = [
+        %{
+          original_file: "{1, 2, 3}",
+          file: "{3, 2, 1}",
+          line: 1,
+          path: "/to/file.ex",
+          original: "",
+          mutation: ""
+        }
+      ]
+
       test_info = {test_files, test_paths, opts, mutations, []}
 
-      assert {[], 1, num, []} = Runner.run_test_loop(test_info, &SuccessCompiler.require_and_run/1)
+      assert {[], 1, num, []} =
+               Runner.run_test_loop(test_info, &SuccessCompiler.require_and_run/1)
+
       assert num > 1
 
       assert_receive {Formatter, {"Mutating file", :nonode@nohost}}
       assert_receive {Formatter, {"Mutating completed", :nonode@nohost}}
+      assert_receive {Formatter, {"No compile dependencies to recompile", :nonode@nohost}}
       assert_receive {Formatter, {"Tests starting", :nonode@nohost}}
       assert_receive {:require_and_run, ^test_files}
       assert_receive {Formatter, {"Tests finished", :nonode@nohost}}
@@ -105,14 +132,28 @@ defmodule Muzak.RunnerTest do
       test_files = [:a, :b]
       test_paths = [:c, :d]
       opts = [:e, :f]
-      mutations = [%{original_file: "{1, 2, 3}", file: "{3, 2, 1}", line: 1}]
+
+      mutations = [
+        %{
+          original_file: "{1, 2, 3}",
+          file: "{3, 2, 1}",
+          line: 1,
+          path: "/to/file.ex",
+          original: "",
+          mutation: ""
+        }
+      ]
+
       test_info = {test_files, test_paths, opts, mutations, []}
 
-      assert {^mutations, 1, num, []} = Runner.run_test_loop(test_info, &FailureCompiler.require_and_run/1)
+      assert {^mutations, 1, num, []} =
+               Runner.run_test_loop(test_info, &FailureCompiler.require_and_run/1)
+
       assert num > 1
 
       assert_receive {Formatter, {"Mutating file", :nonode@nohost}}
       assert_receive {Formatter, {"Mutating completed", :nonode@nohost}}
+      assert_receive {Formatter, {"No compile dependencies to recompile", :nonode@nohost}}
       assert_receive {Formatter, {"Tests starting", :nonode@nohost}}
       assert_receive {:require_and_run, ^test_files}
       assert_receive {Formatter, {"Tests finished", :nonode@nohost}}
