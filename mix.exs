@@ -41,7 +41,7 @@ defmodule Muzak.MixProject do
         "docs/muzak.md": [filename: "muzak", title: "Muzak"],
         "docs/mutators.md": [filename: "mutators", title: "Included mutators"],
         "docs/why_mutation_testing.md": [
-          filename: "what_is_mutation_testing",
+          filename: "why_mutation_testing",
           title: "What is mutation testing?"
         ]
       ],
