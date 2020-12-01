@@ -19,6 +19,7 @@ defmodule Muzak.Config do
     Formatter.start_link()
     Mix.Task.run("compile", args)
     Mix.Task.run("app.start", args)
+    Application.ensure_started(:logger)
     Application.ensure_loaded(:ex_unit)
 
     {matched_test_files, test_paths, ex_unit_opts} = configure_ex_unit(opts)
