@@ -21,7 +21,7 @@ defmodule MyApp.Mixfile do
   defp deps do
     [
       # ...
-      {:muzak, "~> 1.0", only: :test}
+      {:muzak, "~> 1.1", only: :test}
     ]
   end
 end
@@ -34,5 +34,6 @@ $ mix deps.get
 $ mix muzak
 ```
 
-Muzak will then randomly generate 25 mutations in your application and run your test suite against
-each of them. Each time you run `mix muzak` you will see different results.
+Muzak will then randomly generate up to 1000 mutations in your application and run your test suite
+against each of them. If your application contains more than 1000 possible mutations, then you may
+see different results for subsequent runs.

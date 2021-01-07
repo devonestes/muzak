@@ -6,21 +6,27 @@ defmodule Muzak.Config do
   # This is like all side effects, so I'm not even going to try and test it, nor should anything
   # else go in this module
 
-  @switches [only: :string]
-  @ex_unit_option_keys [:max_failures, :formatters]
+  @switches [
+    mutations: :integer,
+    seed: :integer,
+    only: :string,
+    profile: :string,
+    min_coverage: :float
+  ]
+  @ex_unit_option_keys [:include, :seed, :max_failures, :formatters, :exclude, :only]
 
   alias Muzak.{Formatter, Mutations}
 
   @doc false
   # The function to do all our config setup
   def setup(args) do
-    opts = get_opts(args)
-    Code.put_compiler_option(:ignore_module_conflict, true)
-    Formatter.start_link()
+    Application.ensure_started(:logger)
     Mix.Task.run("compile", args)
     Mix.Task.run("app.start", args)
-    Application.ensure_started(:logger)
     Application.ensure_loaded(:ex_unit)
+    opts = get_opts(args)
+    Code.put_compiler_option(:ignore_module_conflict, true)
+    Formatter.start_link(opts)
 
     {matched_test_files, test_paths, ex_unit_opts} = configure_ex_unit(opts)
 
@@ -30,25 +36,65 @@ defmodule Muzak.Config do
   defp get_opts(args) do
     {cli_opts, _} = OptionParser.parse!(args, strict: @switches)
 
-    if path = cli_opts[:only] do
-      unless File.exists?(path) do
-        raise("file `#{path}` passed as argument to `--only` does not exist")
+    {file_opts, _} =
+      if File.exists?(".muzak.exs") do
+        Code.eval_file(".muzak.exs")
+      else
+        {%{default: []}, nil}
       end
-    end
+
+    file_opts =
+      case cli_opts[:profile] do
+        nil -> Map.get(file_opts, :default)
+        profile -> Map.get(file_opts, String.to_atom(profile))
+      end
+
+    seed =
+      0..9
+      |> Stream.cycle()
+      |> Enum.take(600)
+      |> Enum.take_random(6)
+      |> Enum.join()
+      |> String.to_integer()
 
     debug_config =
       if System.get_env("DEBUG") do
         [formatters: [ExUnit.CLIFormatter]]
       else
-        []
+        [formatters: []]
       end
 
-    [mutations: 25, autorun: false, max_failures: 1, formatters: []]
-    |> Keyword.merge(debug_config)
-    |> Keyword.merge(cli_opts)
+    opts =
+      [
+        mutations: 1_000,
+        autorun: false,
+        max_failures: 1,
+        seed: seed
+      ]
+      |> Keyword.merge(debug_config)
+      |> Keyword.merge(file_opts)
+      |> Keyword.merge(cli_opts)
+
+    if Keyword.has_key?(opts, :only) do
+      only = opts[:only]
+
+      {file, line} =
+        case String.split(only, ":") do
+          [file, line] -> {file, [String.to_integer(line)]}
+          _ -> {only, nil}
+        end
+
+      unless File.exists?(file) do
+        raise("file `#{file}` passed as argument to `--only` does not exist")
+      end
+
+      Keyword.put(opts, :mutation_filter, fn _ -> [{file, line}] end)
+    else
+      opts
+    end
   end
 
-  defp configure_ex_unit(opts) do
+  def configure_ex_unit(opts) do
     shell = Mix.shell()
     project = Mix.Project.config()
     test_paths = project[:test_paths] || default_test_paths()
@@ -66,6 +112,7 @@ defmodule Muzak.Config do
     file = Path.join(dir, "test_helper.exs")
 
     if File.exists?(file) do
+      Code.unrequire_files([file])
       Code.require_file(file)
     else
       Mix.shell(shell)

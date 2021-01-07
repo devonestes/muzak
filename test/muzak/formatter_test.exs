@@ -8,7 +8,7 @@ defmodule Muzak.FormatterTest do
   describe "do_print_report/1" do
     test "prints the right thing for a :noop" do
       assert CaptureIO.capture_io(fn ->
-               Formatter.do_print_report({:noop, 123, 123_000, [seed: 632_719]})
+               Formatter.do_print_report({:noop, 123, 123_000, 0.0, [seed: 632_719]})
              end) == """
 
 
@@ -20,7 +20,7 @@ defmodule Muzak.FormatterTest do
 
     test "prints the right thing for :no_tests_run" do
       assert CaptureIO.capture_io(fn ->
-               Formatter.do_print_report({:no_tests_run, 123, 123_000, [seed: 632_719]})
+               Formatter.do_print_report({:no_tests_run, 123, 123_000, 0.0, [seed: 632_719]})
              end) == """
 
 
@@ -32,12 +32,14 @@ defmodule Muzak.FormatterTest do
 
     test "prints the right thing for successful cases" do
       assert CaptureIO.capture_io(fn ->
-               Formatter.do_print_report({[], 123, 123_000, [seed: 632_719]})
+               Formatter.do_print_report({[], 123, 123_000, 0.0, [seed: 632_719]})
              end) == """
 
 
              Finished in 0.1 seconds
              \e[32m123 run - 0 mutations survived\e[0m
+
+             Randomized with seed 632719
              """
     end
 
@@ -126,11 +128,14 @@ defmodule Muzak.FormatterTest do
       summary =
         String.trim("""
         Finished in 0.1 seconds
-        \e[31m123 mutations run - 5 mutations survived\e[0m
+        \e[31m123 mutations run
+        5 survived 98.04% of mutations were found\e[0m
+
+        Randomized with seed 632719
         """)
 
       assert CaptureIO.capture_io(fn ->
-               Formatter.do_print_report({failures, 123, 123_000, [seed: 632_719]})
+               Formatter.do_print_report({failures, 123, 123_000, 98.04, [seed: 632_719]})
              end) == """
 
 

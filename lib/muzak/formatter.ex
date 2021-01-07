@@ -1,5 +1,6 @@
 defmodule Muzak.Formatter do
   @moduledoc false
+
   # Contains all the stuff for formatting and printing of reports
 
   require ExUnit.Assertions
@@ -14,10 +15,10 @@ defmodule Muzak.Formatter do
 
   @doc false
   # The start_link for our printer process
-  def start_link() do
+  def start_link(opts) do
     group_leader = Process.group_leader()
 
-    fn -> print_loop(group_leader) end
+    fn -> print_loop(group_leader, opts) end
     |> spawn_link()
     |> Process.register(__MODULE__)
   end
@@ -32,25 +33,26 @@ defmodule Muzak.Formatter do
   end
 
   @doc false
-  def do_print_report({:noop, _, time, _}) do
+  def do_print_report({:noop, _, time, _, _}) do
     print_time(time)
     IO.puts("Something went wrong - tests did not run for a later set of mutations!\n")
   end
 
-  def do_print_report({:no_tests_run, _, time, _}) do
+  def do_print_report({:no_tests_run, _, time, _, _}) do
     print_time(time)
     IO.puts("Something went wrong - no tests were selected to be run!\n")
   end
 
-  def do_print_report({[], num_mutations, time, _}) do
+  def do_print_report({[], num_mutations, time, _, opts}) do
     print_time(time)
     IO.puts([IO.ANSI.green(), "#{num_mutations} run - 0 mutations survived", IO.ANSI.reset()])
+    IO.puts("\nRandomized with seed #{opts[:seed]}")
   end
 
-  def do_print_report({surviving_mutations, num_mutations, time, _}) do
+  def do_print_report({surviving_mutations, num_mutations, time, success_percentage, opts}) do
     failure_info =
       surviving_mutations
-      |> Enum.sort_by(&"#{&1.path}:#{&1.line}")
+      |> Enum.sort_by(&{&1.path, &1.line})
       |> Enum.reverse()
       |> Enum.reduce([], fn mutation_info, acc ->
         exception =
@@ -66,6 +68,7 @@ defmodule Muzak.Formatter do
             Original and mutation were the same - something went wrong!
               file: #{mutation_info.path}:#{mutation_info.line}
             """)
+
             acc
 
           _ ->
@@ -82,28 +85,54 @@ defmodule Muzak.Formatter do
     IO.puts("")
     IO.puts(failure_info)
     print_time(time, "")
-    msg = "#{num_mutations} mutations run - #{length(surviving_mutations)} mutations survived"
+
+    msg =
+      "#{num_mutations} mutations run\n#{length(surviving_mutations)} survived " <>
+        "#{success_percentage}% of mutations were found"
+
     IO.puts([IO.ANSI.red(), msg, IO.ANSI.reset()])
+    IO.puts("\nRandomized with seed #{opts[:seed]}")
   end
 
-  defp print_loop(group_leader) do
+  defp print_loop(group_leader, opts) do
     receive do
       {:finished, caller} ->
         send(caller, :done)
 
       {:success, _} ->
-        msg = IO.iodata_to_binary([IO.ANSI.green(), ".", IO.ANSI.reset()])
-        IO.write(group_leader, msg)
-        print_loop(group_leader)
+        unless opts[:format] == "progress_bar" do
+          msg = IO.iodata_to_binary([IO.ANSI.green(), ".", IO.ANSI.reset()])
+          IO.write(group_leader, msg)
+        end
+        print_loop(group_leader, opts)
 
       {:failure, _} ->
-        msg = IO.iodata_to_binary([IO.ANSI.red(), "F", IO.ANSI.reset()])
-        IO.write(group_leader, msg)
-        print_loop(group_leader)
+        unless opts[:format] == "progress_bar" do
+          msg = IO.iodata_to_binary([IO.ANSI.red(), "F", IO.ANSI.reset()])
+          IO.write(group_leader, msg)
+        end
+        print_loop(group_leader, opts)
 
-      {msg, node} ->
-        if System.get_env("DEBUG"), do: IO.inspect(group_leader, msg, label: "#{node}")
-        print_loop(group_leader)
+      {:timeout, _} ->
+        unless opts[:format] == "progress_bar" do
+          msg = IO.iodata_to_binary([IO.ANSI.yellow(), "*", IO.ANSI.reset()])
+          IO.write(group_leader, msg)
+        end
+        print_loop(group_leader, opts)
+
+      {msg, _} ->
+        if System.get_env("DEBUG") do
+          IO.puts(group_leader, msg)
+        end
+
+        print_loop(group_leader, opts)
+
+      msg ->
+        if System.get_env("DEBUG") do
+          IO.inspect(msg, label: "#{Node.self()}")
+        end
+
+        print_loop(group_leader, opts)
     end
   end
 

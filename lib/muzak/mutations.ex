@@ -5,59 +5,99 @@ defmodule Muzak.Mutations do
 
   @mutators [
     Muzak.Mutators.Constants.Numbers,
+    Muzak.Mutators.Constants.Strings,
     Muzak.Mutators.Functions.Rename
   ]
 
   @doc false
   def generate_mutations(opts) do
-    Mix.Project.config()
-    |> Keyword.get(:elixirc_paths)
-    |> Enum.flat_map(&ls_r/1)
-    |> Enum.filter(fn path -> opts[:only] in [nil, path] end)
-    |> Enum.shuffle()
-    |> Enum.reduce([], &read_file/2)
-    |> Enum.map(fn info -> Task.async(fn -> mutate_file(info) end) end)
-    |> Enum.reduce([], &reduce_mutations(&1, &2, 25))
-    |> Enum.take(25)
-end
-
-  @doc false
-  def mutate_file(info, name_fun \\ &Muzak.Mutators.Mutator.random_string/1) do
-    mutate_file(info, @mutators, name_fun)
+    opts[:mutation_filter]
+    |> get_files()
+    |> generate_mutations(@mutators, opts[:mutations], opts[:seed])
   end
 
   @doc false
-  def mutate_file({file, path}, mutators, name_fun) do
+  def mutate_file(info, mutators) do
+    mutate_file(info, mutators, 0)
+  end
+
+  def mutate_file(info, mutators, seed) when is_integer(seed) do
+    mutate_file(info, mutators, seed, &Muzak.Mutators.Mutator.random_string/1)
+  end
+
+  def mutate_file(info, mutators, name_fun) do
+    mutate_file(info, mutators, 0, name_fun)
+  end
+
+  def mutate_file(info, nil, seed, name_fun) do
+    mutate_file(info, @mutators, seed, name_fun)
+  end
+
+  def mutate_file({file, path, lines}, mutators, seed, name_fun) do
     {ast, state} = Formatter.to_forms_and_state(file)
 
     mutators
-    |> Enum.flat_map(&mutate(&1, file, path, ast, state, name_fun))
-    |> Enum.shuffle()
+    |> shuffle(seed)
+    |> Enum.map(&Task.async(fn -> mutate(&1, file, lines, path, ast, state, name_fun) end))
+    |> Enum.flat_map(&Task.await(&1, :infinity))
+    |> List.flatten()
+    |> shuffle(seed)
   end
 
-  defp reduce_mutations(ref, acc, num_mutations) when length(acc) >= num_mutations do
-    Task.shutdown(ref, :brutal_kill)
-    acc
+  defp get_files(exclude) do
+    Mix.Project.config()
+    |> Keyword.get(:elixirc_paths)
+    |> Enum.flat_map(&ls_r/1)
+    |> Enum.filter(&String.ends_with?(&1, ".ex"))
+    |> filter(exclude)
+    |> Enum.map(&read_file/1)
   end
 
-  defp reduce_mutations(ref, acc, _) do
-    ref |> Task.await(:infinity) |> Kernel.++(acc) |> Enum.uniq()
+  @stream_opts [
+    timeout: :infinity,
+    ordered: false,
+    max_concurrency: System.schedulers_online() * 2
+  ]
+  defp generate_mutations(files, mutators, num_mutations, seed) do
+    files
+    |> shuffle(seed)
+    |> Task.async_stream(&mutate_file(&1, mutators, seed), @stream_opts)
+    |> Enum.reduce_while([], &reduce_mutations(&1, &2, num_mutations))
   end
 
-  defp read_file(path, acc) do
+  defp reduce_mutations(_, acc, num_mutations) when length(acc) >= num_mutations,
+    do: {:halt, Enum.take(acc, num_mutations)}
+
+  defp reduce_mutations({:ok, result}, acc, _),
+    do: {:cont, result |> Enum.uniq() |> Enum.reduce(acc, &[&1 | &2])}
+
+  defp reduce_mutations(_, acc, _), do: {:cont, acc}
+
+  defp read_file({path, lines}) do
     file = path |> Path.expand() |> File.read!() |> Code.format_string!() |> to_string()
-    [{file, path} | acc]
-  rescue
-    _ ->
-      acc
+    {file, path, lines}
   end
 
-  defp mutate(mutator, file, path, ast, state, name_fun) do
+  defp shuffle(list, seed) do
+    :rand.seed(:exrop, {seed, seed, seed})
+    Enum.shuffle(list)
+  end
+
+  defp filter(files, func) when is_function(func, 1), do: func.(files)
+  defp filter(files, _), do: Enum.map(files, &{&1, nil})
+
+  defp mutate(mutator, file, lines, path, ast, state, name_fun) do
     ast
     |> mutator.mutate(name_fun)
-    |> Enum.reduce([], &[&1 | &2])
+    |> Enum.reduce([], &add_mutation(&1, &2, lines))
     |> Enum.uniq()
     |> Enum.map(&expand_mutation(&1, file, path, state))
+  end
+
+  defp add_mutation(mutation, mutations, nil), do: [mutation | mutations]
+
+  defp add_mutation(mutation, mutations, lines) do
+    if mutation.line in lines, do: [mutation | mutations], else: mutations
   end
 
   defp expand_mutation(mutation, original_file, path, state) do

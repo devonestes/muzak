@@ -63,104 +63,114 @@ defmodule Muzak.RunnerTest do
 
   describe "run_test_loop/1" do
     test "doesn't run tests if the mutation can't compile" do
-      test_files = [:a, :b]
-      test_paths = [:c, :d]
-      opts = [:e, :f]
+      ExUnit.CaptureIO.capture_io(fn ->
+        test_files = [:a, :b]
+        test_paths = [:c, :d]
+        opts = [:e, :f]
 
-      mutations = [
-        %{
-          original_file: "{1, 2}",
-          file: "{1, 2",
-          path: "/to/file.ex",
-          original: "",
-          mutation: "",
-          line: 1
-        }
-      ]
+        mutations = [
+          %{
+            original_file: "{1, 2}",
+            file: "{1, 2",
+            path: "/to/file.ex",
+            original: "",
+            mutation: "",
+            line: 1
+          }
+        ]
 
-      test_info = {test_files, test_paths, opts, mutations, []}
+        test_info = {test_files, test_paths, opts, mutations, []}
 
-      assert {[], 1, num, []} =
-               Runner.run_test_loop(test_info, &SuccessCompiler.require_and_run/1)
+        assert {[], 1, num, 100.0, []} =
+                 Runner.run_test_loop(test_info, &SuccessCompiler.require_and_run/1)
 
-      assert num > 1
+        assert num > 1
 
-      assert_receive {Formatter, {"Mutating file", :nonode@nohost}}
-      assert_receive {Formatter, {"Mutation failed to compile", :nonode@nohost}}
-      assert_receive {Formatter, {"Original file compiled", :nonode@nohost}}
-      assert_receive {Formatter, {"Files unrequired", :nonode@nohost}}
-      assert_receive {Formatter, {:success, :nonode@nohost}}
-      refute_receive _
+        assert_receive {Formatter, {:"Mutating file", :nonode@nohost}}
+        assert_receive {Formatter, {:"Mutation failed to compile", :nonode@nohost}}
+        assert_receive {Formatter, {:"Original file compiled", :nonode@nohost}}
+        assert_receive {Formatter, {:"Files unrequired", :nonode@nohost}}
+        assert_receive {Formatter, {"Running mutation 1 of 1", :nonode@nohost}}
+        assert_receive {Formatter, {:success, :nonode@nohost}}
+        assert_receive {Formatter, {_, :nonode@nohost}}
+        refute_receive _
+      end)
     end
 
     test "calls the ExUnit compiler correctly when the file can be compiled" do
-      test_files = [:a, :b]
-      test_paths = [:c, :d]
-      opts = [:e, :f]
+      ExUnit.CaptureIO.capture_io(fn ->
+        test_files = [:a, :b]
+        test_paths = [:c, :d]
+        opts = [:e, :f]
 
-      mutations = [
-        %{
-          original_file: "{1, 2, 3}",
-          file: "{3, 2, 1}",
-          line: 1,
-          path: "/to/file.ex",
-          original: "",
-          mutation: ""
-        }
-      ]
+        mutations = [
+          %{
+            path: "path/to/file.ex",
+            mutation: [""],
+            original: [""],
+            original_file: "{1, 2, 3}",
+            file: "{3, 2, 1}",
+            line: 1
+          }
+        ]
 
-      test_info = {test_files, test_paths, opts, mutations, []}
+        test_info = {test_files, test_paths, opts, mutations, []}
 
-      assert {[], 1, num, []} =
-               Runner.run_test_loop(test_info, &SuccessCompiler.require_and_run/1)
+        assert {[], 1, num, 100.0, []} =
+                 Runner.run_test_loop(test_info, &SuccessCompiler.require_and_run/1)
 
-      assert num > 1
+        assert num > 1
 
-      assert_receive {Formatter, {"Mutating file", :nonode@nohost}}
-      assert_receive {Formatter, {"Mutating completed", :nonode@nohost}}
-      assert_receive {Formatter, {"No compile dependencies to recompile", :nonode@nohost}}
-      assert_receive {Formatter, {"Tests starting", :nonode@nohost}}
-      assert_receive {:require_and_run, ^test_files}
-      assert_receive {Formatter, {"Tests finished", :nonode@nohost}}
-      assert_receive {Formatter, {"Original file compiled", :nonode@nohost}}
-      assert_receive {Formatter, {"Files unrequired", :nonode@nohost}}
-      assert_receive {Formatter, {:success, :nonode@nohost}}
-      refute_receive _
+        assert_receive {Formatter, {:"Mutating file", :nonode@nohost}}
+        assert_receive {Formatter, {:"Mutating completed", :nonode@nohost}}
+        assert_receive {Formatter, {:"Tests starting", :nonode@nohost}}
+        assert_receive {:require_and_run, ^test_files}
+        assert_receive {Formatter, {:"Tests finished", :nonode@nohost}}
+        assert_receive {Formatter, {:"Original file compiled", :nonode@nohost}}
+        assert_receive {Formatter, {:"Files unrequired", :nonode@nohost}}
+        assert_receive {Formatter, {:success, :nonode@nohost}}
+        assert_receive {Formatter, {"Running mutation 1 of 1", :nonode@nohost}}
+        assert_receive {Formatter, {_, :nonode@nohost}}
+        refute_receive _
+      end)
     end
 
     test "sends the right messages when there is a failure" do
-      test_files = [:a, :b]
-      test_paths = [:c, :d]
-      opts = [:e, :f]
+      ExUnit.CaptureIO.capture_io(fn ->
+        test_files = [:a, :b]
+        test_paths = [:c, :d]
+        opts = [:e, :f]
 
-      mutations = [
-        %{
-          original_file: "{1, 2, 3}",
-          file: "{3, 2, 1}",
-          line: 1,
-          path: "/to/file.ex",
-          original: "",
-          mutation: ""
-        }
-      ]
+        mutations = [
+          %{
+            path: "path/to/file.ex",
+            original: [""],
+            mutation: [""],
+            original_file: "{1, 2, 3}",
+            file: "{3, 2, 1}",
+            line: 1
+          }
+        ]
 
-      test_info = {test_files, test_paths, opts, mutations, []}
+        test_info = {test_files, test_paths, opts, mutations, []}
 
-      assert {^mutations, 1, num, []} =
-               Runner.run_test_loop(test_info, &FailureCompiler.require_and_run/1)
+        assert {^mutations, 1, num, 0.0, []} =
+                 Runner.run_test_loop(test_info, &FailureCompiler.require_and_run/1)
 
-      assert num > 1
+        assert num > 1
 
-      assert_receive {Formatter, {"Mutating file", :nonode@nohost}}
-      assert_receive {Formatter, {"Mutating completed", :nonode@nohost}}
-      assert_receive {Formatter, {"No compile dependencies to recompile", :nonode@nohost}}
-      assert_receive {Formatter, {"Tests starting", :nonode@nohost}}
-      assert_receive {:require_and_run, ^test_files}
-      assert_receive {Formatter, {"Tests finished", :nonode@nohost}}
-      assert_receive {Formatter, {"Original file compiled", :nonode@nohost}}
-      assert_receive {Formatter, {"Files unrequired", :nonode@nohost}}
-      assert_receive {Formatter, {:failure, :nonode@nohost}}
-      refute_receive _
+        assert_receive {Formatter, {:"Mutating file", :nonode@nohost}}
+        assert_receive {Formatter, {:"Mutating completed", :nonode@nohost}}
+        assert_receive {Formatter, {:"Tests starting", :nonode@nohost}}
+        assert_receive {:require_and_run, ^test_files}
+        assert_receive {Formatter, {:"Tests finished", :nonode@nohost}}
+        assert_receive {Formatter, {:"Original file compiled", :nonode@nohost}}
+        assert_receive {Formatter, {:"Files unrequired", :nonode@nohost}}
+        assert_receive {Formatter, {:failure, :nonode@nohost}}
+        assert_receive {Formatter, {"Running mutation 1 of 1", :nonode@nohost}}
+        assert_receive {Formatter, {_, :nonode@nohost}}
+        refute_receive _
+      end)
     end
   end
 end

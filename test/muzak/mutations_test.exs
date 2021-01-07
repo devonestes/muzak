@@ -29,7 +29,7 @@ defmodule Muzak.MutationsTest do
         path: "path/to/file.ex"
       }
 
-      {file, "path/to/file.ex"}
+      {file, "path/to/file.ex", Enum.to_list(1..10)}
       |> Mutations.mutate_file([Rename], fn _ -> "randomatom" end)
       |> assert_lists_equal([expected])
     end
@@ -75,7 +75,7 @@ defmodule Muzak.MutationsTest do
         path: "path/to/file.ex"
       }
 
-      {file, "path/to/file.ex"}
+      {file, "path/to/file.ex", [1, 2, 3, 4, 5]}
       |> Mutations.mutate_file([Numbers], &name_fun/1)
       |> assert_lists_equal([expected1, expected2])
     end
