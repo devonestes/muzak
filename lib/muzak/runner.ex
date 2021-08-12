@@ -283,13 +283,13 @@ defmodule Muzak.Runner do
   end
 
   defp require_and_run(matched_test_files) do
-    task = Task.async(ExUnit, :run, [])
+    task = ExUnit.async_run()
 
     try do
       case Kernel.ParallelCompiler.require(matched_test_files, []) do
         {:ok, _, _} ->
           ExUnit.Server.modules_loaded()
-          {:ok, Task.await(task, :infinity)}
+          {:ok, ExUnit.await_run(task)}
 
         {:error, _, _} ->
           Task.shutdown(task, :brutal_kill)
