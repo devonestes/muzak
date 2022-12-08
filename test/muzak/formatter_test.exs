@@ -12,7 +12,7 @@ defmodule Muzak.FormatterTest do
              end) == """
 
 
-             Finished in 0.1 seconds
+             Finished in 0.1 seconds (0.00s async, 0.1s sync)
              Something went wrong - tests did not run for a later set of mutations!
 
              """
@@ -24,7 +24,7 @@ defmodule Muzak.FormatterTest do
              end) == """
 
 
-             Finished in 0.1 seconds
+             Finished in 0.1 seconds (0.00s async, 0.1s sync)
              Something went wrong - no tests were selected to be run!
 
              """
@@ -36,7 +36,7 @@ defmodule Muzak.FormatterTest do
              end) == """
 
 
-             Finished in 0.1 seconds
+             Finished in 0.1 seconds (0.00s async, 0.1s sync)
              \e[32m123 run - 0 mutations survived\e[0m
 
              Randomized with seed 632719
@@ -127,7 +127,7 @@ defmodule Muzak.FormatterTest do
 
       summary =
         String.trim("""
-        Finished in 0.1 seconds
+        Finished in 0.1 seconds (0.00s async, 0.1s sync)
         \e[31m123 mutations run
         5 survived 98.04% of mutations were found\e[0m
 

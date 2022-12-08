@@ -56,13 +56,13 @@ defmodule Muzak.Mutators.Functions.RenameTest do
                  :defmodule,
                  [do: [line: 1], end: [line: 19], line: 1],
                  [
-                   {:__aliases__, [line: 1], [:Tester]},
+                   {:__aliases__, [{:last, [line: 1]}, {:line, 1}], [:Tester]},
                    [
                      {
                        {:__block__, [line: 1], [:do]},
                        {
                          :__block__,
-                         '',
+                         [],
                          [
                            {
                              :defmacrop,
@@ -73,11 +73,8 @@ defmodule Muzak.Mutators.Functions.RenameTest do
                                line: 2
                              ],
                              [
-                               {
-                                 :random_function,
-                                 [closing: [line: 2], line: 2],
-                                 [{:arg, [line: 2], nil}]
-                               },
+                               {:random_function, [closing: [line: 2], line: 2],
+                                [{:arg, [line: 2], nil}]},
                                [
                                  {
                                    {:__block__, [line: 2], [:do]},
@@ -88,11 +85,8 @@ defmodule Muzak.Mutators.Functions.RenameTest do
                                        [
                                          {
                                            {:__block__, [line: 3], [:do]},
-                                           {
-                                             :priv_fun,
-                                             [closing: [line: 4], line: 4],
-                                             [{:arg, [line: 4], nil}]
-                                           }
+                                           {:priv_fun, [closing: [line: 4], line: 4],
+                                            [{:arg, [line: 4], nil}]}
                                          }
                                        ]
                                      ]
@@ -110,11 +104,8 @@ defmodule Muzak.Mutators.Functions.RenameTest do
                                line: 8
                              ],
                              [
-                               {
-                                 :my_macro,
-                                 [closing: [line: 8], line: 8],
-                                 [{:arg, [line: 8], nil}]
-                               },
+                               {:my_macro, [closing: [line: 8], line: 8],
+                                [{:arg, [line: 8], nil}]},
                                [
                                  {
                                    {:__block__, [line: 8], [:do]},
@@ -125,11 +116,8 @@ defmodule Muzak.Mutators.Functions.RenameTest do
                                        [
                                          {
                                            {:__block__, [line: 9], [:do]},
-                                           {
-                                             :my_fun,
-                                             [closing: [line: 10], line: 10],
-                                             [{:arg, [line: 10], nil}]
-                                           }
+                                           {:my_fun, [closing: [line: 10], line: 10],
+                                            [{:arg, [line: 10], nil}]}
                                          }
                                        ]
                                      ]
@@ -142,19 +130,13 @@ defmodule Muzak.Mutators.Functions.RenameTest do
                              :def,
                              [end_of_expression: [newlines: 2, line: 14], line: 14],
                              [
-                               {
-                                 :my_fun,
-                                 [closing: [line: 14], line: 14],
-                                 [{:arg, [line: 14], nil}]
-                               },
+                               {:my_fun, [closing: [line: 14], line: 14],
+                                [{:arg, [line: 14], nil}]},
                                [
                                  {
-                                   {:__block__, [line: 14], [:do]},
-                                   {
-                                     :priv_fun,
-                                     [closing: [line: 14], line: 14],
-                                     [{:arg, [line: 14], nil}]
-                                   }
+                                   {:__block__, [{:format, :keyword}, {:line, 14}], [:do]},
+                                   {:priv_fun, [closing: [line: 14], line: 14],
+                                    [{:arg, [line: 14], nil}]}
                                  }
                                ]
                              ]
@@ -163,22 +145,16 @@ defmodule Muzak.Mutators.Functions.RenameTest do
                              :defp,
                              [do: [line: 16], end: [line: 18], line: 16],
                              [
-                               {
-                                 :priv_fun,
-                                 [closing: [line: 16], line: 16],
-                                 [{:arg, [line: 16], nil}]
-                               },
+                               {:priv_fun, [closing: [line: 16], line: 16],
+                                [{:arg, [line: 16], nil}]},
                                [
                                  {
                                    {:__block__, [line: 16], [:do]},
-                                   {
-                                     :+,
-                                     [line: 17],
-                                     [
-                                       {:arg, [line: 17], nil},
-                                       {:__block__, [token: "1", line: 17], [1]}
-                                     ]
-                                   }
+                                   {:+, [line: 17],
+                                    [
+                                      {:arg, [line: 17], nil},
+                                      {:__block__, [token: "1", line: 17], [1]}
+                                    ]}
                                  }
                                ]
                              ]
@@ -222,13 +198,13 @@ defmodule Muzak.Mutators.Functions.RenameTest do
                  :defmodule,
                  [do: [line: 1], end: [line: 19], line: 1],
                  [
-                   {:__aliases__, [line: 1], [:Tester]},
+                   {:__aliases__, [{:last, [line: 1]}, {:line, 1}], [:Tester]},
                    [
                      {
                        {:__block__, [line: 1], [:do]},
                        {
                          :__block__,
-                         '',
+                         [],
                          [
                            {
                              :defmacrop,
@@ -239,11 +215,8 @@ defmodule Muzak.Mutators.Functions.RenameTest do
                                line: 2
                              ],
                              [
-                               {
-                                 :priv_macro,
-                                 [closing: [line: 2], line: 2],
-                                 [{:arg, [line: 2], nil}]
-                               },
+                               {:priv_macro, [closing: [line: 2], line: 2],
+                                [{:arg, [line: 2], nil}]},
                                [
                                  {
                                    {:__block__, [line: 2], [:do]},
@@ -254,11 +227,8 @@ defmodule Muzak.Mutators.Functions.RenameTest do
                                        [
                                          {
                                            {:__block__, [line: 3], [:do]},
-                                           {
-                                             :priv_fun,
-                                             [closing: [line: 4], line: 4],
-                                             [{:arg, [line: 4], nil}]
-                                           }
+                                           {:priv_fun, [closing: [line: 4], line: 4],
+                                            [{:arg, [line: 4], nil}]}
                                          }
                                        ]
                                      ]
@@ -276,11 +246,8 @@ defmodule Muzak.Mutators.Functions.RenameTest do
                                line: 8
                              ],
                              [
-                               {
-                                 :random_function,
-                                 [closing: [line: 8], line: 8],
-                                 [{:arg, [line: 8], nil}]
-                               },
+                               {:random_function, [closing: [line: 8], line: 8],
+                                [{:arg, [line: 8], nil}]},
                                [
                                  {
                                    {:__block__, [line: 8], [:do]},
@@ -291,11 +258,8 @@ defmodule Muzak.Mutators.Functions.RenameTest do
                                        [
                                          {
                                            {:__block__, [line: 9], [:do]},
-                                           {
-                                             :my_fun,
-                                             [closing: [line: 10], line: 10],
-                                             [{:arg, [line: 10], nil}]
-                                           }
+                                           {:my_fun, [closing: [line: 10], line: 10],
+                                            [{:arg, [line: 10], nil}]}
                                          }
                                        ]
                                      ]
@@ -308,19 +272,13 @@ defmodule Muzak.Mutators.Functions.RenameTest do
                              :def,
                              [end_of_expression: [newlines: 2, line: 14], line: 14],
                              [
-                               {
-                                 :my_fun,
-                                 [closing: [line: 14], line: 14],
-                                 [{:arg, [line: 14], nil}]
-                               },
+                               {:my_fun, [closing: [line: 14], line: 14],
+                                [{:arg, [line: 14], nil}]},
                                [
                                  {
-                                   {:__block__, [line: 14], [:do]},
-                                   {
-                                     :priv_fun,
-                                     [closing: [line: 14], line: 14],
-                                     [{:arg, [line: 14], nil}]
-                                   }
+                                   {:__block__, [{:format, :keyword}, {:line, 14}], [:do]},
+                                   {:priv_fun, [closing: [line: 14], line: 14],
+                                    [{:arg, [line: 14], nil}]}
                                  }
                                ]
                              ]
@@ -329,22 +287,16 @@ defmodule Muzak.Mutators.Functions.RenameTest do
                              :defp,
                              [do: [line: 16], end: [line: 18], line: 16],
                              [
-                               {
-                                 :priv_fun,
-                                 [closing: [line: 16], line: 16],
-                                 [{:arg, [line: 16], nil}]
-                               },
+                               {:priv_fun, [closing: [line: 16], line: 16],
+                                [{:arg, [line: 16], nil}]},
                                [
                                  {
                                    {:__block__, [line: 16], [:do]},
-                                   {
-                                     :+,
-                                     [line: 17],
-                                     [
-                                       {:arg, [line: 17], nil},
-                                       {:__block__, [token: "1", line: 17], [1]}
-                                     ]
-                                   }
+                                   {:+, [line: 17],
+                                    [
+                                      {:arg, [line: 17], nil},
+                                      {:__block__, [token: "1", line: 17], [1]}
+                                    ]}
                                  }
                                ]
                              ]
@@ -376,13 +328,13 @@ defmodule Muzak.Mutators.Functions.RenameTest do
                  :defmodule,
                  [do: [line: 1], end: [line: 19], line: 1],
                  [
-                   {:__aliases__, [line: 1], [:Tester]},
+                   {:__aliases__, [{:last, [line: 1]}, {:line, 1}], [:Tester]},
                    [
                      {
                        {:__block__, [line: 1], [:do]},
                        {
                          :__block__,
-                         '',
+                         [],
                          [
                            {
                              :defmacrop,
@@ -393,11 +345,8 @@ defmodule Muzak.Mutators.Functions.RenameTest do
                                line: 2
                              ],
                              [
-                               {
-                                 :priv_macro,
-                                 [closing: [line: 2], line: 2],
-                                 [{:arg, [line: 2], nil}]
-                               },
+                               {:priv_macro, [closing: [line: 2], line: 2],
+                                [{:arg, [line: 2], nil}]},
                                [
                                  {
                                    {:__block__, [line: 2], [:do]},
@@ -408,11 +357,8 @@ defmodule Muzak.Mutators.Functions.RenameTest do
                                        [
                                          {
                                            {:__block__, [line: 3], [:do]},
-                                           {
-                                             :priv_fun,
-                                             [closing: [line: 4], line: 4],
-                                             [{:arg, [line: 4], nil}]
-                                           }
+                                           {:priv_fun, [closing: [line: 4], line: 4],
+                                            [{:arg, [line: 4], nil}]}
                                          }
                                        ]
                                      ]
@@ -430,11 +376,8 @@ defmodule Muzak.Mutators.Functions.RenameTest do
                                line: 8
                              ],
                              [
-                               {
-                                 :my_macro,
-                                 [closing: [line: 8], line: 8],
-                                 [{:arg, [line: 8], nil}]
-                               },
+                               {:my_macro, [closing: [line: 8], line: 8],
+                                [{:arg, [line: 8], nil}]},
                                [
                                  {
                                    {:__block__, [line: 8], [:do]},
@@ -445,11 +388,8 @@ defmodule Muzak.Mutators.Functions.RenameTest do
                                        [
                                          {
                                            {:__block__, [line: 9], [:do]},
-                                           {
-                                             :my_fun,
-                                             [closing: [line: 10], line: 10],
-                                             [{:arg, [line: 10], nil}]
-                                           }
+                                           {:my_fun, [closing: [line: 10], line: 10],
+                                            [{:arg, [line: 10], nil}]}
                                          }
                                        ]
                                      ]
@@ -462,19 +402,13 @@ defmodule Muzak.Mutators.Functions.RenameTest do
                              :def,
                              [end_of_expression: [newlines: 2, line: 14], line: 14],
                              [
-                               {
-                                 :my_fun,
-                                 [closing: [line: 14], line: 14],
-                                 [{:arg, [line: 14], nil}]
-                               },
+                               {:random_function, [closing: [line: 14], line: 14],
+                                [{:arg, [line: 14], nil}]},
                                [
                                  {
-                                   {:__block__, [line: 14], [:do]},
-                                   {
-                                     :priv_fun,
-                                     [closing: [line: 14], line: 14],
-                                     [{:arg, [line: 14], nil}]
-                                   }
+                                   {:__block__, [{:format, :keyword}, {:line, 14}], [:do]},
+                                   {:priv_fun, [closing: [line: 14], line: 14],
+                                    [{:arg, [line: 14], nil}]}
                                  }
                                ]
                              ]
@@ -483,22 +417,16 @@ defmodule Muzak.Mutators.Functions.RenameTest do
                              :defp,
                              [do: [line: 16], end: [line: 18], line: 16],
                              [
-                               {
-                                 :priv_fun,
-                                 [closing: [line: 16], line: 16],
-                                 [{:arg, [line: 16], nil}]
-                               },
+                               {:priv_fun, [closing: [line: 16], line: 16],
+                                [{:arg, [line: 16], nil}]},
                                [
                                  {
                                    {:__block__, [line: 16], [:do]},
-                                   {
-                                     :+,
-                                     [line: 17],
-                                     [
-                                       {:arg, [line: 17], nil},
-                                       {:__block__, [token: "1", line: 17], [1]}
-                                     ]
-                                   }
+                                   {:+, [line: 17],
+                                    [
+                                      {:arg, [line: 17], nil},
+                                      {:__block__, [token: "1", line: 17], [1]}
+                                    ]}
                                  }
                                ]
                              ]
@@ -534,13 +462,13 @@ defmodule Muzak.Mutators.Functions.RenameTest do
                  :defmodule,
                  [do: [line: 1], end: [line: 19], line: 1],
                  [
-                   {:__aliases__, [line: 1], [:Tester]},
+                   {:__aliases__, [{:last, [line: 1]}, {:line, 1}], [:Tester]},
                    [
                      {
                        {:__block__, [line: 1], [:do]},
                        {
                          :__block__,
-                         '',
+                         [],
                          [
                            {
                              :defmacrop,
@@ -551,11 +479,8 @@ defmodule Muzak.Mutators.Functions.RenameTest do
                                line: 2
                              ],
                              [
-                               {
-                                 :priv_macro,
-                                 [closing: [line: 2], line: 2],
-                                 [{:arg, [line: 2], nil}]
-                               },
+                               {:priv_macro, [closing: [line: 2], line: 2],
+                                [{:arg, [line: 2], nil}]},
                                [
                                  {
                                    {:__block__, [line: 2], [:do]},
@@ -566,11 +491,8 @@ defmodule Muzak.Mutators.Functions.RenameTest do
                                        [
                                          {
                                            {:__block__, [line: 3], [:do]},
-                                           {
-                                             :priv_fun,
-                                             [closing: [line: 4], line: 4],
-                                             [{:arg, [line: 4], nil}]
-                                           }
+                                           {:priv_fun, [closing: [line: 4], line: 4],
+                                            [{:arg, [line: 4], nil}]}
                                          }
                                        ]
                                      ]
@@ -588,11 +510,8 @@ defmodule Muzak.Mutators.Functions.RenameTest do
                                line: 8
                              ],
                              [
-                               {
-                                 :my_macro,
-                                 [closing: [line: 8], line: 8],
-                                 [{:arg, [line: 8], nil}]
-                               },
+                               {:my_macro, [closing: [line: 8], line: 8],
+                                [{:arg, [line: 8], nil}]},
                                [
                                  {
                                    {:__block__, [line: 8], [:do]},
@@ -603,11 +522,8 @@ defmodule Muzak.Mutators.Functions.RenameTest do
                                        [
                                          {
                                            {:__block__, [line: 9], [:do]},
-                                           {
-                                             :my_fun,
-                                             [closing: [line: 10], line: 10],
-                                             [{:arg, [line: 10], nil}]
-                                           }
+                                           {:my_fun, [closing: [line: 10], line: 10],
+                                            [{:arg, [line: 10], nil}]}
                                          }
                                        ]
                                      ]
@@ -620,19 +536,13 @@ defmodule Muzak.Mutators.Functions.RenameTest do
                              :def,
                              [end_of_expression: [newlines: 2, line: 14], line: 14],
                              [
-                               {
-                                 :my_fun,
-                                 [closing: [line: 14], line: 14],
-                                 [{:arg, [line: 14], nil}]
-                               },
+                               {:my_fun, [closing: [line: 14], line: 14],
+                                [{:arg, [line: 14], nil}]},
                                [
                                  {
-                                   {:__block__, [line: 14], [:do]},
-                                   {
-                                     :priv_fun,
-                                     [closing: [line: 14], line: 14],
-                                     [{:arg, [line: 14], nil}]
-                                   }
+                                   {:__block__, [{:format, :keyword}, {:line, 14}], [:do]},
+                                   {:priv_fun, [closing: [line: 14], line: 14],
+                                    [{:arg, [line: 14], nil}]}
                                  }
                                ]
                              ]
@@ -641,22 +551,16 @@ defmodule Muzak.Mutators.Functions.RenameTest do
                              :defp,
                              [do: [line: 16], end: [line: 18], line: 16],
                              [
-                               {
-                                 :random_function,
-                                 [closing: [line: 16], line: 16],
-                                 [{:arg, [line: 16], nil}]
-                               },
+                               {:random_function, [closing: [line: 16], line: 16],
+                                [{:arg, [line: 16], nil}]},
                                [
                                  {
                                    {:__block__, [line: 16], [:do]},
-                                   {
-                                     :+,
-                                     [line: 17],
-                                     [
-                                       {:arg, [line: 17], nil},
-                                       {:__block__, [token: "1", line: 17], [1]}
-                                     ]
-                                   }
+                                   {:+, [line: 17],
+                                    [
+                                      {:arg, [line: 17], nil},
+                                      {:__block__, [token: "1", line: 17], [1]}
+                                    ]}
                                  }
                                ]
                              ]

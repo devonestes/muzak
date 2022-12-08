@@ -22,72 +22,112 @@ defmodule Muzak.Mutators.Constants.StringsTest do
         %{
           example_format: :line,
           line: 7,
-          mutated_ast:
-            {:defmodule, [do: [line: 2], end: [line: 9], line: 2],
-             [
-               {:__aliases__, [line: 2], [:Tester]},
-               [
-                 {{:__block__, [line: 2], [:do]},
-                  {:__block__, [],
-                   [
-                     {:@, [end_of_expression: [newlines: 1, line: 3], line: 3],
-                      [
-                        {:doc, [line: 3],
-                         [
-                           {:__block__, [delimiter: "\"", line: 3],
-                            ["a string doc that shouldn't mutate"]}
-                         ]}
-                      ]},
-                     {:def, [do: [line: 4], end: [line: 8], line: 4],
-                      [
-                        {:heredoc, [closing: [line: 4], line: 4], []},
+          mutated_ast: {
+            :defmodule,
+            [do: [line: 2], end: [line: 9], line: 2],
+            [
+              {:__aliases__, [{:last, [line: 2]}, {:line, 2}], [:Tester]},
+              [
+                {
+                  {:__block__, [line: 2], [:do]},
+                  {
+                    :__block__,
+                    [],
+                    [
+                      {
+                        :@,
+                        [end_of_expression: [newlines: 1, line: 3], line: 3],
                         [
-                          {{:__block__, [line: 4], [:do]},
-                           {:<>, [line: 7],
-                            [
-                              {:__block__, [delimiter: "\"\"\"", line: 5], ["Heredoc\n"]},
-                              {:__block__, [delimiter: "\"", line: 7], ["random_string"]}
-                            ]}}
+                          {:doc, [line: 3],
+                           [
+                             {:__block__, [delimiter: "\"", line: 3],
+                              ["a string doc that shouldn't mutate"]}
+                           ]}
                         ]
-                      ]}
-                   ]}}
-               ]
-             ]}
+                      },
+                      {
+                        :def,
+                        [do: [line: 4], end: [line: 8], line: 4],
+                        [
+                          {:heredoc, [closing: [line: 4], line: 4], []},
+                          [
+                            {
+                              {:__block__, [line: 4], [:do]},
+                              {
+                                :<>,
+                                [line: 7],
+                                [
+                                  {:__block__,
+                                   [{:delimiter, "\"\"\""}, {:indentation, 12}, {:line, 5}],
+                                   ["Heredoc\n"]},
+                                  {:__block__, [delimiter: "\"", line: 7], ["random_string"]}
+                                ]
+                              }
+                            }
+                          ]
+                        ]
+                      }
+                    ]
+                  }
+                }
+              ]
+            ]
+          }
         },
         %{
           example_format: :line,
           line: 5,
-          mutated_ast:
-            {:defmodule, [do: [line: 2], end: [line: 9], line: 2],
-             [
-               {:__aliases__, [line: 2], [:Tester]},
-               [
-                 {{:__block__, [line: 2], [:do]},
-                  {:__block__, [],
-                   [
-                     {:@, [end_of_expression: [newlines: 1, line: 3], line: 3],
-                      [
-                        {:doc, [line: 3],
-                         [
-                           {:__block__, [delimiter: "\"", line: 3],
-                            ["a string doc that shouldn't mutate"]}
-                         ]}
-                      ]},
-                     {:def, [do: [line: 4], end: [line: 8], line: 4],
-                      [
-                        {:heredoc, [closing: [line: 4], line: 4], []},
+          mutated_ast: {
+            :defmodule,
+            [do: [line: 2], end: [line: 9], line: 2],
+            [
+              {:__aliases__, [{:last, [line: 2]}, {:line, 2}], [:Tester]},
+              [
+                {
+                  {:__block__, [line: 2], [:do]},
+                  {
+                    :__block__,
+                    [],
+                    [
+                      {
+                        :@,
+                        [end_of_expression: [newlines: 1, line: 3], line: 3],
                         [
-                          {{:__block__, [line: 4], [:do]},
-                           {:<>, [line: 7],
-                            [
-                              {:__block__, [delimiter: "\"\"\"", line: 5], ["random_string"]},
-                              {:__block__, [delimiter: "\"", line: 7], ["other string"]}
-                            ]}}
+                          {:doc, [line: 3],
+                           [
+                             {:__block__, [delimiter: "\"", line: 3],
+                              ["a string doc that shouldn't mutate"]}
+                           ]}
                         ]
-                      ]}
-                   ]}}
-               ]
-             ]}
+                      },
+                      {
+                        :def,
+                        [do: [line: 4], end: [line: 8], line: 4],
+                        [
+                          {:heredoc, [closing: [line: 4], line: 4], []},
+                          [
+                            {
+                              {:__block__, [line: 4], [:do]},
+                              {
+                                :<>,
+                                [line: 7],
+                                [
+                                  {:__block__,
+                                   [{:delimiter, "\"\"\""}, {:indentation, 12}, {:line, 5}],
+                                   ["random_string"]},
+                                  {:__block__, [delimiter: "\"", line: 7], ["other string"]}
+                                ]
+                              }
+                            }
+                          ]
+                        ]
+                      }
+                    ]
+                  }
+                }
+              ]
+            ]
+          }
         }
       ])
     end

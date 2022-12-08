@@ -104,6 +104,7 @@ defmodule Muzak.Formatter do
           msg = IO.iodata_to_binary([IO.ANSI.green(), ".", IO.ANSI.reset()])
           IO.write(group_leader, msg)
         end
+
         print_loop(group_leader, opts)
 
       {:failure, _} ->
@@ -111,6 +112,7 @@ defmodule Muzak.Formatter do
           msg = IO.iodata_to_binary([IO.ANSI.red(), "F", IO.ANSI.reset()])
           IO.write(group_leader, msg)
         end
+
         print_loop(group_leader, opts)
 
       {:timeout, _} ->
@@ -118,6 +120,7 @@ defmodule Muzak.Formatter do
           msg = IO.iodata_to_binary([IO.ANSI.yellow(), "*", IO.ANSI.reset()])
           IO.write(group_leader, msg)
         end
+
         print_loop(group_leader, opts)
 
       {msg, _} ->

@@ -55,7 +55,12 @@ defmodule Muzak.Mutators.Mutator do
   end
 
   @random_string ?a..?z |> Stream.cycle() |> Enum.take(520) |> Enum.take_random(10) |> to_string()
-  @random_number 0..9 |> Stream.cycle() |> Enum.take(520) |> Enum.take_random(2) |> Enum.join() |> String.to_integer()
+  @random_number 0..9
+                 |> Stream.cycle()
+                 |> Enum.take(520)
+                 |> Enum.take_random(2)
+                 |> Enum.join()
+                 |> String.to_integer()
 
   @doc false
   def random_string(), do: random_string(:string)
